@@ -1,0 +1,33 @@
+# Python 虚拟环境
+venv/
+env/
+
+# Python 编译文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.whl
+
+# PyCharm 配置文件（2.9.1专属，避免提交）
+.idea/
+*.iml
+.pyc
+.DS_Store
+
+# 日志文件
+*.log
+
+# 环境变量文件
+.env
+.env.local
+
+# 前端/node 相关
+node_modules/
+npm-debug.log
+dist/
+build/
+
+# 网关相关
+gateway/node_modules/
+gateway/dist/
