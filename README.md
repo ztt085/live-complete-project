@@ -30,14 +30,17 @@
 - requirements.txt：依赖管理文件，记录项目所需第三方库及具体版本，用于快速搭建开发环境。
 
 ### 二、主要接口（路径、方法、返回格式）
-| 功能	 | 方法 |	    | 路径 |	                            | 描述 |	                                      | 返回格式 |
+| 功能         | 方法 | 路径                     | 描述                               | 返回格式                                                                 |
 |--------------|------|--------------------------|------------------------------------|--------------------------------------------------------------------------|
-- 服务健康检查  GET	 /api/health	               验证后端服务是否正常运行	              {"code": 200, "message": "success", "data": {"service": "live-backend", "status": "running", "timestamp": "时间字符串"}}
-- 获取用户信息	 GET	 /api/user/info	             获取当前登录用户的基本信息（Mock 数据）	{"code": 200, "message": "获取用户信息成功", "data": {"userId": "UUID", "username": "用户名", "nickname": "昵称", "avatar": "头像链接", "email": "邮箱", "phone": "手机号", "gender": 0/1/2, "level": 等级，"createTime": "创建时间"}}
-- 获取直播列表	 GET	 /api/live/list	             分页获取直播列表	                    {"code": 200, "message": "获取直播列表成功", "data": {"records": [直播数据数组], "total": 总条数，"page": 当前页，"size": 每页条数，"pages": 总页数}}
-- 创建直播	     POST  /api/live/create	           接收直播标题、分类参数，创建直播记录	  {"code": 200, "message": "直播创建成功", "data": {"liveId": "UUID", "title": "直播标题", "category": "分类", "createTime": "创建时间", "status": 0}}
-- 获取直播详情	 GET	 /api/live/detail/<live_id>	 根据直播 ID 获取单场直播的详细信息	    {"code": 200, "message": "获取直播详情成功", "data": {"liveId": "传入的直播 ID", "title": "直播标题", "anchorName": "主播名", "coverImage": "封面链接", "viewCount": 观看数，"status": 0/1/2, "startTime": "开始时间", "description": "直播描述", "tags": ["标签 1", "标签 2"]}}
+| 服务健康检查 | GET  | /api/health              | 验证后端服务是否正常运行           | {"code": 200, "message": "success", "data": {"service": "live-backend", "status": "running", "timestamp": "时间字符串"}} |
+| 获取用户信息 | GET  | /api/user/info           | 获取当前登录用户的基本信息（Mock数据） | {"code": 200, "message": "获取用户信息成功", "data": {"userId": "UUID", "username": "用户名", "nickname": "昵称", "avatar": "头像链接", "email": "邮箱", "phone": "手机号", "gender": 0/1/2, "level": "等级", "createTime": "创建时间"}} |
+| 获取直播列表 | GET  | /api/live/list           | 分页获取直播列表                   | {"code": 200, "message": "获取直播列表成功", "data": {"records": ["直播数据数组"], "total": "总条数", "page": "当前页", "size": "每页条数", "pages": "总页数"}} |
+| 创建直播     | POST | /api/live/create         | 接收直播标题、分类参数，创建直播记录 | {"code": 200, "message": "直播创建成功", "data": {"liveId": "UUID", "title": "直播标题", "category": "分类", "createTime": "创建时间", "status": 0}} |
+| 获取直播详情 | GET  | /api/live/detail/<live_id> | 根据直播ID获取单场直播的详细信息   | {"code": 200, "message": "获取直播详情成功", "data": {"liveId": "传入的直播ID", "title": "直播标题", "anchorName": "主播名", "coverImage": "封面链接", "viewCount": "观看数", "status": "0/1/2", "startTime": "开始时间", "description": "直播描述", "tags": ["标签1", "标签2"]}} |
 
+
+## 项目开发过程笔记
+### 一、项目实现思路
 ## 项目开发过程笔记
 ### 一、项目实现思路
 - 开发流程是 “先拆模块→再联调→最后部署”：先分别完成后端接口、网关转发逻辑、前端页面开发，本地联调验证各模块衔接，最后部署到阿里云服务器并验证全链路可用性。
@@ -63,11 +66,11 @@
 
 ### 四、部署步骤与踩坑记录
 - 1、**部署步骤**
-  - （1）服务器环境初始化：通过阿里云控制台 Workbench 完成服务器远程登录；安装 Git、Python3、pip3 等核心工具，升级 pip 至最新版本，验证各工具版本可正常调用
-  - （2）后端（Flask）部署：借助 Git 拉取项目仓库代码，进入后端（backend）目录；基于项目的 requirements.txt 文件，安装 Flask、Gunicorn 等后端依赖；使用 Gunicorn 以生产模式启动后端服务，绑定 端口，配置后台运行并将日志输出至指定文件，保障服务持续可用。
-  - （3）网关（Express）部署：通过 NVM 安装 Node.js 16 版本（适配网关依赖）；进入网关（gateway）目录，编辑转发配置文件将请求转发地址指向后端 127.0.0.1:5000。
-  - （4）前端（Nginx）部署：安装 Nginx 并设置开机自启，编辑 nginx.conf 配置文件：配置前端静态资源根路径、解决前端路由刷新 404 问题，同时将 API 请求转发至网关 3000 端口、WebSocket（直播功能）请求也转发至网关对应端口；启动 Nginx 服务。
-  - （5）网络与验证：在阿里云 ECS 安全组中开放 80（HTTP）、3000（网关）等项目所需端口；本地浏览器访问服务器公网 IP，验证前端页面加载、接口数据请求、直播功能等核心功能是否正常。
+- （1）服务器环境初始化：通过阿里云控制台 Workbench 完成服务器远程登录；安装 Git、Python3、pip3 等核心工具，升级 pip 至最新版本，验证各工具版本可正常调用
+- （2）后端（Flask）部署：借助 Git 拉取项目仓库代码，进入后端（backend）目录；基于项目的 requirements.txt 文件，安装 Flask、Gunicorn 等后端依赖；使用 Gunicorn 以生产模式启动后端服务，绑定 端口，配置后台运行并将日志输出至指定文件，保障服务持续可用。
+- （3）网关（Express）部署：通过 NVM 安装 Node.js 16 版本（适配网关依赖）；进入网关（gateway）目录，编辑转发配置文件将请求转发地址指向后端 127.0.0.1:5000。
+- （4）前端（Nginx）部署：安装 Nginx 并设置开机自启，编辑 nginx.conf 配置文件：配置前端静态资源根路径、解决前端路由刷新 404 问题，同时将 API 请求转发至网关 3000 端口、WebSocket（直播功能）请求也转发至网关对应端口；启动 Nginx 服务。
+- （5）网络与验证：在阿里云 ECS 安全组中开放 80（HTTP）、3000（网关）等项目所需端口；本地浏览器访问服务器公网 IP，验证前端页面加载、接口数据请求、直播功能等核心功能是否正常。
 - 2、**踩坑记录**
 - （1）**环境版本兼容问题**
   - 问题：网关启动报错，排查发现 Node.js 版本过低，与网关依赖包不兼容；
@@ -86,6 +89,7 @@
 - 主语言是 Python，深耕数据分析全流程，同时熟练掌握 SQL 查询与 Linux 系统操作。
 - 在技术学习和项目实践中，我始终抱着 “先拆后拼、边做边调” 的思路：从基础的 Python、JavaScript 语法入手，逐步掌握 Flask 后端框架、Express 网关开发和前端开发技能，形成 “后端 + 网关 + 前端” 的全栈技术视野。
 - 除了技术实践，我还注重数据思维的培养，能运用数据分析方法梳理项目问题、优化流程。做事踏实细心，遇到复杂问题会拆解成小步骤逐一突破，喜欢在解决问题后总结经验，形成可复用的方法。
+
 
 
 
